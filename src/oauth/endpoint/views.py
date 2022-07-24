@@ -24,8 +24,6 @@ class AuthorView(viewsets.ReadOnlyModelViewSet):
 
 
 class SocialLinkView(viewsets.ModelViewSet):
-    """ CRUD ссылок соц. сетей пользователя
-    """
     serializer_class = serializer.SocialLinkSerializer
     permission_classes = [IsAuthor]
 
