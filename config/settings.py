@@ -20,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%y_#3ma0__2gtkbf1e0#u_e9=aa)e*huba+yw*11as9mdw-ovt'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%y_#3ma0__2gtkbf1e0#u_e9=aa)e*huba+yw*11as9mdw-ovt')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["DJANGO_ALLOWED_HOSTS", "127.0.0.1"]
 
 
 # Application definition
@@ -39,14 +39,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+
+    'django_filters',
+    "corsheaders",
     'rest_framework.authtoken',
     'drf_yasg',
     'src.oauth',
+    'audio_library',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -78,13 +83,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.environ.get("POSTGRES_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("POSTGRES_USER", "user"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -117,13 +126,11 @@ USE_I18N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-
-        'rest_framework.authentication.TokenAuthentication',
-
-    )
-
+    'DEFAULT_AUTHENTICATION_CLASSES': ('src.oauth.services.auth_backend.AuthBackend',),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # Static files (CSS, JavaScript, Images)
@@ -135,6 +142,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('src.oauth.services.auth_backend.AuthBackend', ),
