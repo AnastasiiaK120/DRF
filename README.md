@@ -1,4 +1,4 @@
-# DRF
+# DRF Sound-Cloud Project
 
 The Sound Cloud project is an audio platform that allows people to find, listen to and download music.
 Musicians can download music for free use.
